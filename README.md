@@ -20,12 +20,18 @@ A lightweight, zero-dependency weather page built with plain HTML, CSS, and Java
 
 ## How to run
 
-Open `weather.html` directly in any modern browser — no build step or server needed.
+No build step or server needed — just clone the repo and open the file in any modern browser.
 
+```bash
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name
 ```
-# In VS Code terminal or PowerShell
-start C:\Users\vaasa\weather.html
-```
+
+Then open `weather.html`:
+
+- **Windows:** double-click `weather.html`, or run `start weather.html` in the terminal
+- **macOS:** run `open weather.html` in the terminal
+- **Linux:** run `xdg-open weather.html` in the terminal
 
 Or in VS Code: **File → Open File → weather.html**, then open with Live Preview or your default browser.
 
