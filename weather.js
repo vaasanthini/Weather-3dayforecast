@@ -124,6 +124,29 @@ async function geocodeCity(name) {
 }
 
 /**
+ * Reverse-geocodes coordinates to a human-readable city name via Nominatim.
+ * Falls back to 'Your location' on any error.
+ * @param {number} lat
+ * @param {number} lon
+ * @returns {Promise<string>}
+ */
+async function reverseGeocode(lat, lon) {
+  try {
+    const url = new URL('https://nominatim.openstreetmap.org/reverse');
+    url.searchParams.set('lat', lat);
+    url.searchParams.set('lon', lon);
+    url.searchParams.set('format', 'json');
+    const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+    if (!res.ok) return 'Your location';
+    const data = await res.json();
+    const a = data.address;
+    return a?.city || a?.town || a?.village || a?.county || 'Your location';
+  } catch {
+    return 'Your location';
+  }
+}
+
+/**
  * Wraps the browser Geolocation API in a Promise, resolving to `fallback` on denial or unavailability.
  * Centralises geolocation logic so `requestGeolocation` and `getLocation` share a single implementation
  * and differ only in their fallback value — satisfying the DRY and Open/Closed principles.
@@ -134,7 +157,12 @@ function geolocate(fallback) {
   return new Promise(resolve => {
     if (!navigator.geolocation) return resolve(fallback);
     navigator.geolocation.getCurrentPosition(
-      pos => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude, label: 'Your location' }),
+      async pos => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        const label = await reverseGeocode(lat, lon);
+        resolve({ lat, lon, label });
+      },
       ()  => resolve(fallback),
       { timeout: 3000 }
     );
